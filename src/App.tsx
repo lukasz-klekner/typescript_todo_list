@@ -3,24 +3,20 @@ import React, { useState } from 'react'
 import './App.css'
 import InputField from './components/InputField'
 import TodoList from './components/TodoList'
-import { Todo } from './model'
+import { ActionsName, useTodoReducer } from './reducer'
 
 const App: React.FC = () => {
   const [todo, setTodo] = useState('')
-  const [todos, setTodos] = useState<Todo[]>([])
+  const { todos, dispatch } = useTodoReducer([])
 
   const handleAdd = (event: React.FormEvent) => {
     event.preventDefault()
 
     if (todo) {
-      setTodos([
-        ...todos,
-        {
-          id: Date.now(),
-          todo,
-          isDone: false,
-        },
-      ])
+      dispatch({
+        type: ActionsName.add,
+        payload: todo,
+      })
       setTodo('')
     }
   }
@@ -29,7 +25,7 @@ const App: React.FC = () => {
     <div className='App'>
       <span className='heading'>Taskify</span>
       <InputField todo={todo} setTodo={setTodo} handleAdd={handleAdd} />
-      <TodoList todos={todos} setTodos={setTodos} />
+      <TodoList todos={todos} dispatch={dispatch} />
     </div>
   )
 }

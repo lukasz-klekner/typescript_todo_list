@@ -2,36 +2,30 @@ import React, { useEffect, useRef, useState } from 'react'
 import { AiFillEdit, AiFillDelete } from 'react-icons/ai'
 import { MdDone } from 'react-icons/md'
 import { Todo } from '../model'
+import { ActionsName, Actions } from '../reducer'
 
 interface Props {
   todo: Todo
   todos: Todo[]
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
+  dispatch: React.Dispatch<Actions>
 }
 
-const SingleTodo = ({ todo, todos, setTodos }: Props) => {
+const SingleTodo = ({ todo, todos, dispatch }: Props) => {
   const [edit, setEdit] = useState(false)
   const [editTodo, setEditTodo] = useState<string>(todo.todo)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleEdit = (e: React.FormEvent, id: number) => {
     e.preventDefault()
-    setTodos(
-      todos.map((todo) => (todo.id === id ? { ...todo, todo: editTodo } : todo))
-    )
+    dispatch({
+      type: ActionsName.edit,
+      payload: {
+        id,
+        newValue: editTodo,
+      },
+    })
+
     setEdit(false)
-  }
-
-  const handleDelete = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id))
-  }
-
-  const handleDone = (id: number) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, isDone: !todo.isDone } : todo
-      )
-    )
   }
 
   useEffect(() => {
@@ -61,10 +55,18 @@ const SingleTodo = ({ todo, todos, setTodos }: Props) => {
         >
           <AiFillEdit />
         </span>
-        <span className='icon' onClick={() => handleDelete(todo.id)}>
+        <span
+          className='icon'
+          onClick={() =>
+            dispatch({ type: ActionsName.remove, payload: todo.id })
+          }
+        >
           <AiFillDelete />
         </span>
-        <span className='icon' onClick={() => handleDone(todo.id)}>
+        <span
+          className='icon'
+          onClick={() => dispatch({ type: ActionsName.done, payload: todo.id })}
+        >
           <MdDone />
         </span>
       </div>
